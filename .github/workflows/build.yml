@@ -1,7 +1,10 @@
 name: gokong build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+
 on:
-  push:
-    branches: [ master ]
   pull_request:
 jobs:
   build:
@@ -9,13 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
-      with:
-        stable: 'false'
-        go-version: '1.16.6' # The Go version to download (if necessary) and use.
-    - run: go version
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Run test
-      run: make test
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          check-latest: true
+          cache: true
 
+      - name: Run tests
+        run: make test COVER_FILE=cover.out
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: cover.out
