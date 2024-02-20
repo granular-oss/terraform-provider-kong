@@ -99,10 +99,6 @@ EOT
 }`
 
 const testCreateImplicitStrictGlobalPluginConfig = `
-provider "kong" {
-    strict_plugins_match = "true"
-}
-
 resource "kong_plugin" "hmac_auth" {
 	name  = "hmac-auth"
 	enabled = "true"
@@ -145,10 +141,6 @@ EOT
 }`
 
 const testUpdateImplicitStrictGlobalPluginConfig = `
-provider "kong" {
-    strict_plugins_match = "true"
-}
-
 resource "kong_plugin" "hmac_auth" {
 	name  = "hmac-auth"
 	config_json = <<EOT
