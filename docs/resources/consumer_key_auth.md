@@ -26,3 +26,12 @@ resource "kong_consumer_key_auth" "consumer_key_auth" {
 * `consumer_id` - (Required) the id of the consumer to associate the credentials to
 * `key` - (Optional) Unique key to authenticate the client; if omitted the plugin will generate one
 * `tags` - (Optional) A list of strings associated with the consumer key auth for grouping and filtering
+
+
+## Import
+
+To import a consumer_key_auth:
+
+```shell
+terraform import kong_consumer_key_auth.<consumer_identifier> <consumer_id>
+```

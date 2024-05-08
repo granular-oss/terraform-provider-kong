@@ -31,3 +31,12 @@ resource "kong_consumer_acl" "consumer_acl" {
 * `consumer_id` - (Required) the id of the consumer to be configured
 * `group` - (Required) the acl group
 * `tags` - (Optional) A list of strings associated with the consumer acl for grouping and filtering
+
+
+## Import
+
+To import a consumer_acl:
+
+```shell
+terraform import kong_consumer_acl.<consumer_identifier> <consumer_id>
+```
