@@ -30,7 +30,7 @@ resource "kong_consumer_key_auth" "consumer_key_auth" {
 
 ## Import
 
-To import a consumer_key_auth:
+To import a kong_consumer_key_auth:
 
 ```shell
 terraform import kong_consumer_key_auth.<consumer_identifier> <consumer_id>
