@@ -28,3 +28,12 @@ resource "kong_consumer_basic_auth" "consumer_basic_auth" {
 * `username` - (Required) username to be used for basic auth
 * `password` - (Required) password to be used for basic auth
 * `tags` - (Optional) A list of strings associated with the consumer basic auth for grouping and filtering
+
+
+## Import
+
+To import a kong_consumer_basic_auth:
+
+```shell
+terraform import kong_consumer_basic_auth.<consumer_identifier> <consumer_id>
+```

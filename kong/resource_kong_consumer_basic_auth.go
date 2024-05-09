@@ -3,6 +3,7 @@ package kong
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/kong/go-kong/kong"
@@ -14,6 +15,9 @@ func resourceKongConsumerBasicAuth() *schema.Resource {
 		ReadContext:   resourceKongConsumerBasicAuthRead,
 		DeleteContext: resourceKongConsumerBasicAuthDelete,
 		UpdateContext: resourceKongConsumerBasicAuthUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"consumer_id": {
 				Type:     schema.TypeString,

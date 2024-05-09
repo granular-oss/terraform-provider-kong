@@ -36,3 +36,12 @@ resource "kong_consumer_jwt_auth" "consumer_jwt_config" {
 * `rsa_public_key` - (Optional) If algorithm is `RS256` or `ES256`, the public key (in PEM format) to use to verify the token’s signature
 * `secret` - (Optional) If algorithm is `HS256` or `ES256`, the secret used to sign JWTs for this credential. If left out, will be auto-generated
 * `tags` - (Optional) A list of strings associated with the consumer JWT auth for grouping and filtering
+
+
+## Import
+
+To import a kong_consumer_jwt_auth:
+
+```shell
+terraform import kong_consumer_jwt_auth.<consumer_identifier> <consumer_id>
+```
