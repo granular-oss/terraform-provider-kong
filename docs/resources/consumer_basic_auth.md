@@ -32,7 +32,7 @@ resource "kong_consumer_basic_auth" "consumer_basic_auth" {
 
 ## Import
 
-To import a consumer_basic_auth:
+To import a kong_consumer_basic_auth:
 
 ```shell
 terraform import kong_consumer_basic_auth.<consumer_identifier> <consumer_id>
