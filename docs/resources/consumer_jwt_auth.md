@@ -40,7 +40,7 @@ resource "kong_consumer_jwt_auth" "consumer_jwt_config" {
 
 ## Import
 
-To import a consumer_jwt_auth:
+To import a kong_consumer_jwt_auth:
 
 ```shell
 terraform import kong_consumer_jwt_auth.<consumer_identifier> <consumer_id>
