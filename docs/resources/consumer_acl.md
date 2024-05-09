@@ -35,7 +35,7 @@ resource "kong_consumer_acl" "consumer_acl" {
 
 ## Import
 
-To import a consumer_acl:
+To import a kong_consumer_acl:
 
 ```shell
 terraform import kong_consumer_acl.<consumer_identifier> <consumer_id>
