@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/granular-oss/terraform-provider-kong/kong/containers"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/kevholditch/terraform-provider-kong/kong/containers"
 )
 
 const defaultKongVersion = "2.5.0-ubuntu"

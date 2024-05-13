@@ -1,8 +1,8 @@
-module github.com/kevholditch/terraform-provider-kong
+module github.com/granular-oss/terraform-provider-kong
 
 go 1.21
 
-replace github.com/kevholditch/terraform-provider-kong/kong => ./kong
+replace github.com/granular-oss/terraform-provider-kong/kong => ./kong
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.32.0
