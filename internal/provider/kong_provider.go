@@ -60,7 +60,6 @@ func basicAuth(username, password string) string {
 	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
-// GetKongClient returns a Kong client
 func GetKongClient(opt Config) (*kong.Client, error) {
 
 	var tlsConfig tls.Config
@@ -69,7 +68,10 @@ func GetKongClient(opt Config) (*kong.Client, error) {
 	}
 
 	c := &http.Client{}
-	defaultTransport := http.DefaultTransport.(*http.Transport)
+	defaultTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		return nil, errors.New("DefaultTransport is wrong type.")
+	}
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
 
