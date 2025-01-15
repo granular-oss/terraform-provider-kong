@@ -1,0 +1,85 @@
+#!/bin/bash
+
+echo "Waiting for kong to be active..."
+curl -s -f --retry 10 -o /dev/null --retry-delay 5 --retry-all-errors http://localhost:8001/status
+
+CA_CERT_BODY=$(cat ca.crt | jq -Rsr '{cert: ., id:"a0518569-74ea-4548-ba13-f852f7517191"}')
+echo "Creating test ca cert"
+curl -s -f http://localhost/:8001/ca_certificates/a0518569-74ea-4548-ba13-f852f7517191 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/ca_certificates -H "Content-Type: application/json" -o /dev/null \
+    -d "$CA_CERT_BODY"
+
+echo "Creating test cert"
+CERT_BODY=$(jq -nr --arg cert "$(cat ca.crt)" --arg key "$(cat ca.key)" '{cert: $cert, key: $key, id:"56c71339-eda3-4c34-9aff-22ac90539119"}')
+curl -s -f http://localhost/:8001/certificates/56c71339-eda3-4c34-9aff-22ac90539119 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/certificates -H "Content-Type: application/json" -o /dev/null \
+    -d "$CERT_BODY"
+
+echo "Creating test kong service"
+curl -s -f http://localhost:8001/services/test -o /dev/null || \
+    curl -s -X POST http://localhost:8001/services -H "Content-Type: application/json" -o /dev/null \
+    -d '{"id":"204ee4c2-6dc0-44fb-93e1-4fbeb24489c7","name":"test", "host":"example.com"}'
+
+echo "Creating test kong route"
+curl -s -f http://localhost:8001/services/test/routes/test -o /dev/null || \
+    curl -s -X POST http://localhost:8001/services/test/routes -H "Content-Type: application/json" -o /dev/null \
+    -d '{"name": "test", "paths":["/foobar"], "id":"772e8b14-b020-4164-b52d-3643f6310821"}'
+
+echo "Create test service_plugin"
+curl -s -f http://localhost:8001/services/test/plugins/19a479c1-3999-471f-a13b-467421be7e1c -H "Content-Type: application/json" -o /dev/null || \
+    curl -s -X POST http://localhost:8001/services/test/plugins -H "Content-Type: application/json" -o /dev//null \
+    -d '{"name":"cors", "config":{},"id":"19a479c1-3999-471f-a13b-467421be7e1c"}'
+
+echo "Create test route_plugin"
+curl -s -f http://localhost:8001/routes/test/plugins/6c32041b-9ab7-4ca2-a7a0-7138eb0be9be -H "Content-Type: application/json" -o /dev/null || \
+    curl -s -X POST http://localhost:8001/routes/test/plugins -H "Content-Type: application/json" -o /dev/null \
+    -d '{"name":"jwt", "config":{},"id":"6c32041b-9ab7-4ca2-a7a0-7138eb0be9be"}'
+
+echo "Creating test consumer"
+curl -s -f http://localhost:8001/consumers/test -o /dev/null || \
+    curl -s -X POST http://localhost:8001/consumers -H "Content-Type: application/json" -o /dev/null \
+    -d '{"username":"test", "id":"068141a0-93c3-4286-8329-97a95b9fe22d"}'
+
+curl -s -f http://localhost:8001/consumers/test/plugins/2a5e754b-7cb8-4801-8a01-4bd4c7e54a01 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/consumers/test/plugins -H "Content-Type: application/json" -o /dev/null \
+    -d '{"name":"aws-lambda", "config":{},"id":"2a5e754b-7cb8-4801-8a01-4bd4c7e54a01"}'
+
+echo "Creating test consumer group"
+curl -s -f http://localhost:8001/consumer_groups/test -o /dev/null || \
+    curl -s -X POST http://localhost:8001/consumer_groups -H "Content-Type: application/json" -o /dev/null \
+    -d '{"name":"test", "id":"03edb0c3-6c6e-44f0-86fc-9d86ce3e1fa3"}'
+
+echo "Creating test acl"
+curl -s -f http://localhost:8001/acls/5dd417e8-c8c4-48cf-be08-e288e29649a6 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/acls -H "Content-Type: application/json" -o /dev/null \
+    -d '{"group":"test","consumer":{"id":"068141a0-93c3-4286-8329-97a95b9fe22d"}, "id":"5dd417e8-c8c4-48cf-be08-e288e29649a6"}'
+
+echo "Creating test basic auth"
+curl -s -f http://localhost:8001/basic-auths/bd0f8189-e21c-4bac-9e4f-c2a7f2d04780 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/basic-auths -H "Content-Type: application/json" -o /dev/null \
+    -d '{"username":"test_basic","password":"foobar","consumer":{"id":"068141a0-93c3-4286-8329-97a95b9fe22d"}, "id":"bd0f8189-e21c-4bac-9e4f-c2a7f2d04780"}'
+
+echo "Creating test jwt"
+curl -s -f http://localhost:8001/jwts/da8b0cd6-f1d3-4731-ba20-873254d9d474 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/jwts -H "Content-Type: application/json" -o /dev/null \
+    -d '{"key":"fake_key", "secret":"secret","consumer":{"id":"068141a0-93c3-4286-8329-97a95b9fe22d"}, "id":"da8b0cd6-f1d3-4731-ba20-873254d9d474"}'
+
+echo "Creating test key auth"
+curl -s -f http://localhost:8001/key-auths/58babb72-d2b2-4b9d-a80c-148dc8ead8f4 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/key-auths -H "Content-Type: application/json" -o /dev/null \
+    -d '{"key":"super_secret","consumer":{"id":"068141a0-93c3-4286-8329-97a95b9fe22d"}, "id":"58babb72-d2b2-4b9d-a80c-148dc8ead8f4"}'
+
+echo "Creating test oauth2"
+curl -s -f http://localhost:8001/oauth2/1428d5e5-32e0-482a-bac0-c6a4c6de6504 -o /dev/null || \
+    curl -s -X POST http://localhost:8001/oauth2 -H "Content-Type: application/json" -o /dev/null \
+    -d '{"client_id":"1673b842-f396-4c9e-83df-f5fe05fcef1d","client_secret":"super_secret","consumer":{"id":"068141a0-93c3-4286-8329-97a95b9fe22d"},"id":"1428d5e5-32e0-482a-bac0-c6a4c6de6504","name":"test-oauth"}'
+
+echo "Create test upstream"
+curl -s -f http://localhost:8001/upstreams/5133ba73-4ca3-42b2-9b31-87cfd13951b3 -H "Content-Type: application/json" -o /dev/null || \
+    curl -s -X POST http://localhost:8001/upstreams -H "Content-Type: application/json" -o /dev/null \
+    -d '{"name":"test-upstream", "id":"5133ba73-4ca3-42b2-9b31-87cfd13951b3"}'
+
+echo "Create test target"
+curl -s -f http://localhost:8001/upstreams/test-upstream/targets/921687b2-ac57-4fa5-a99f-ae08fbf30eff -o /dev/null || \
+    curl -s -X POST http://localhost:8001/upstreams/test-upstream/targets -H "Content-Type: application/json" -o /dev/null \
+    -d '{"target":"test.com","id": "921687b2-ac57-4fa5-a99f-ae08fbf30eff"}'
