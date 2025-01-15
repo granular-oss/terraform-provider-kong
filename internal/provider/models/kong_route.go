@@ -101,17 +101,6 @@ func RouteModelFromResponse(route *kong.Route) KongRouteModel {
 	}
 }
 
-func convertStringArray(value types.List) []*string {
-	if value.IsUnknown() || value.IsNull() {
-		return nil
-	}
-	ret := []*string{}
-	for _, val := range value.Elements() {
-		ret = append(ret, kong.String(val.String()))
-	}
-	return ret
-}
-
 func RequestFromRouteModel(ctx context.Context, model *KongRouteModel) *kong.Route {
 	source := []*kong.CIDRPort{}
 	for _, s := range model.Source {

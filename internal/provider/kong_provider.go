@@ -7,14 +7,11 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
 	"strings"
 
 	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
 )
-
-var computedPluginProperties = []string{"created_at", "id", "consumer", "service", "route"}
 
 // Config holds config details to use to talk to the Kong admin API.
 type Config struct {
@@ -107,53 +104,4 @@ func GetKongClient(opt Config) (*kong.Client, error) {
 	}
 
 	return kongClient, nil
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-
-	return false
-}
-
-func getRegex(r *regexp.Regexp, err error) *regexp.Regexp {
-	return r
-}
-
-func readIntArrayFromInterface(in interface{}) []int {
-	if arr := in.([]interface{}); arr != nil {
-		array := make([]int, len(arr))
-		for i, x := range arr {
-			item := x.(int)
-			array[i] = item
-		}
-
-		return array
-	}
-
-	return []int{}
-}
-
-// StringValueSlice converts a slice of string pointers
-// to an slice of strings
-func StringValueSlice(src []*string) []string {
-	dst := make([]string, len(src))
-	for i := 0; i < len(src); i++ {
-		if src[i] != nil {
-			dst[i] = *(src[i])
-		}
-	}
-	return dst
-}
-
-// IDToString converts a string pointer to a string
-// or if nil returns an empty string.
-func IDToString(v *string) string {
-	if v == nil {
-		return ""
-	}
-	return *v
 }

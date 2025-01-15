@@ -176,7 +176,7 @@ func (r *kongPluginResource) Delete(ctx context.Context, req resource.DeleteRequ
 }
 
 func (r *kongPluginResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	if strings.Index(req.ID, ":") == -1 {
+	if !strings.Contains(req.ID, ":") {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
 		return
 	}
