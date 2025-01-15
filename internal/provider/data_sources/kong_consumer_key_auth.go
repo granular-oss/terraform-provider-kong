@@ -16,7 +16,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &kongConsumerKeyAuthDataSource{}
 )
 
-func NewKongConsumerKeyAuthDataSource() datasource.DataSource {
+func KongConsumerKeyAuthDataSource() datasource.DataSource {
 	return &kongConsumerKeyAuthDataSource{}
 }
 
@@ -108,7 +108,7 @@ func (d *kongConsumerKeyAuthDataSource) Read(ctx context.Context, req datasource
 
 	result := kongModels.ConsumerKeyAuthModelFromResponse(key)
 	diags2 := resp.State.Set(ctx, dataSourceModel{
-		ID:               result.ID,
+		ID:               result.KongId,
 		ConsumerID:       result.ConsumerID,
 		Key:              result.Key,
 		ConsumerUsername: data.ConsumerUsername,

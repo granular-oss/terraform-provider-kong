@@ -24,7 +24,7 @@ var (
 	_ resource.ResourceWithImportState = &kongPluginResource{}
 )
 
-// NewkongPluginResource is a helper function to simplify the provider implementation.
+// KongPluginResource is a helper function to simplify the provider implementation.
 func KongPluginResource() resource.Resource {
 	return &kongPluginResource{}
 }
@@ -61,6 +61,7 @@ func (r *kongPluginResource) Schema(_ context.Context, _ resource.SchemaRequest,
 			"enabled":         schema.BoolAttribute{Optional: true, Computed: true, Default: booldefault.StaticBool(true)},
 			"config_json":     schema.StringAttribute{Required: true},
 			"computed_config": schema.StringAttribute{Computed: true},
+			"strict_match":    schema.BoolAttribute{Optional: true, Computed: true, Default: booldefault.StaticBool(false)},
 			"tags":            schema.ListAttribute{Optional: true, ElementType: types.StringType},
 		},
 	}

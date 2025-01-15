@@ -16,9 +16,8 @@ type KongConsumerKeyAuthModel struct {
 }
 
 func ConsumerKeyAuthModelFromResponse(key *kong.KeyAuth) KongConsumerKeyAuthModel {
-	id := *key.Consumer.ID + ":" + *key.ID
 	return KongConsumerKeyAuthModel{
-		ID:         types.StringValue(id),
+		ID:         types.StringValue(BuildCompositeId([]string{*key.Consumer.ID, *key.ID})),
 		KongId:     types.StringPointerValue(key.ID),
 		ConsumerID: types.StringPointerValue(key.Consumer.ID),
 		Key:        types.StringPointerValue(key.Key),

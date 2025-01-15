@@ -22,7 +22,7 @@ var (
 	_ resource.ResourceWithImportState = &kongConsumerAclResource{}
 )
 
-// NewkongConsumerAclResource is a helper function to simplify the provider implementation.
+// KongConsumerAclResource is a helper function to simplify the provider implementation.
 func KongConsumerAclResource() resource.Resource {
 	return &kongConsumerAclResource{}
 }
@@ -174,7 +174,7 @@ func (r *kongConsumerAclResource) ImportState(ctx context.Context, req resource.
 	idParts := kongModels.ParseCompositeId(req.ID)
 	acl, err := r.client.ACLs.Get(ctx, &idParts[0], &idParts[1])
 	if err != nil {
-		resp.Diagnostics.AddError("Cannot find kong_consumer_acl for the given name/id:group", err.Error())
+		resp.Diagnostics.AddError("Cannot find kong_consumer_acl for the given name/id|group", err.Error())
 	}
 	id := kongModels.BuildCompositeId([]string{*acl.Consumer.ID, *acl.Group})
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)

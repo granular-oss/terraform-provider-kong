@@ -12,25 +12,25 @@ import (
 )
 
 var (
-	_ datasource.DataSource              = &KongRouteDataSource{}
-	_ datasource.DataSourceWithConfigure = &KongRouteDataSource{}
+	_ datasource.DataSource              = &kongRouteDataSource{}
+	_ datasource.DataSourceWithConfigure = &kongRouteDataSource{}
 )
 
-func NewKongRouteDataSource() datasource.DataSource {
-	return &KongRouteDataSource{}
+func KongRouteDataSource() datasource.DataSource {
+	return &kongRouteDataSource{}
 }
 
-type KongRouteDataSource struct {
+type kongRouteDataSource struct {
 	client *kong.Client
 }
 
 // Metadata returns the data source type name.
-func (d *KongRouteDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *kongRouteDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_route"
 }
 
 // Configure adds the provider configured client to the data source.
-func (d *KongRouteDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *kongRouteDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	// Add a nil check when handling ProviderData because Terraform
 	// sets that data after it calls the ConfigureProvider RPC.
 	if req.ProviderData == nil {
@@ -51,7 +51,7 @@ func (d *KongRouteDataSource) Configure(_ context.Context, req datasource.Config
 }
 
 // Schema defines the schema for the data source.
-func (d *KongRouteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *kongRouteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id":         schema.StringAttribute{Optional: true},
@@ -93,7 +93,7 @@ func (d *KongRouteDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (d *KongRouteDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *kongRouteDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data kongModels.KongRouteModel
 	client := d.client.Routes
 	diags1 := req.Config.Get(ctx, &data)

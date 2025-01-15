@@ -21,15 +21,16 @@ type KongPluginModel struct {
 	Enabled        types.Bool   `tfsdk:"enabled"`
 	ConfigJson     types.String `tfsdk:"config_json"`
 	ComputedConfig types.String `tfsdk:"computed_config"`
-	// StrictMatch types.Bool   `tfsdk:"strict_match"`
-	Tags types.List `tfsdk:"tags"`
+	StrictMatch    types.Bool   `tfsdk:"strict_match"`
+	Tags           types.List   `tfsdk:"tags"`
 }
 
 func PluginModelFromResponse(diag diag.Diagnostics, plugin *kong.Plugin, plan KongPluginModel) KongPluginModel {
-	configJson, err := json.Marshal(plugin.Config)
+	b, err := json.Marshal(plugin.Config)
 	if err != nil {
 		diag.AddError("Failed to parse plugin config", err.Error())
 	}
+	configJsonString := string(b)
 	var serviceId *string
 	if plugin.Service != nil {
 		serviceId = plugin.Service.ID
@@ -42,6 +43,10 @@ func PluginModelFromResponse(diag diag.Diagnostics, plugin *kong.Plugin, plan Ko
 	if plugin.Consumer != nil {
 		consumerId = plugin.Consumer.ID
 	}
+	var configJson = plan.ConfigJson
+	if plan.StrictMatch.ValueBool() {
+		configJson = types.StringValue(configJsonString)
+	}
 	return KongPluginModel{
 		ID:             types.StringPointerValue(plugin.ID),
 		Name:           types.StringPointerValue(plugin.Name),
@@ -49,8 +54,9 @@ func PluginModelFromResponse(diag diag.Diagnostics, plugin *kong.Plugin, plan Ko
 		ServiceId:      types.StringPointerValue(serviceId),
 		RouteId:        types.StringPointerValue(routeId),
 		Enabled:        types.BoolPointerValue(plugin.Enabled),
-		ConfigJson:     plan.ConfigJson,
-		ComputedConfig: types.StringValue(string(configJson)),
+		ConfigJson:     configJson,
+		ComputedConfig: types.StringValue(configJsonString),
+		StrictMatch:    plan.StrictMatch,
 		Tags:           ParseResponseStringList(plugin.Tags),
 	}
 }

@@ -106,14 +106,6 @@ func (p *kongProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
-
-	// Example client configuration for data sources and resources
-	// client := http.DefaultClient
-	// resp.DataSourceData = client
-	// resp.ResourceData = client
-
 	kongConfig := &Config{
 		Address:            configWithEnvFallback(config.KongAdminUri, "KONG_ADMIN_ADDR", "http://localhost:8001"),
 		Username:           configWithEnvFallback(config.KongAdminUsername, "KONG_ADMIN_USERNAME", ""),
@@ -137,18 +129,18 @@ func (p *kongProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 func (p *kongProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		kongData.NewKongCertificateDataSource,
-		kongData.NewKongConsumerDataSource,
-		kongData.NewKongConsumerAclDataSource,
-		kongData.NewKongConsumerBasicAuthDataSource,
-		kongData.NewKongConsumerJwtDataSource,
-		kongData.NewKongConsumerKeyAuthDataSource,
-		kongData.NewKongConsumerOauth2DataSource,
-		kongData.NewKongPluginDataSource,
-		kongData.NewKongRouteDataSource,
-		kongData.NewKongServiceDataSource,
-		kongData.NewKongTargetDataSource,
-		kongData.NewKongUpstreamDataSource,
+		kongData.KongCertificateDataSource,
+		kongData.KongConsumerDataSource,
+		kongData.KongConsumerAclDataSource,
+		kongData.KongConsumerBasicAuthDataSource,
+		kongData.KongConsumerJwtDataSource,
+		kongData.KongConsumerKeyAuthDataSource,
+		kongData.KongConsumerOauth2DataSource,
+		kongData.KongPluginDataSource,
+		kongData.KongRouteDataSource,
+		kongData.KongServiceDataSource,
+		kongData.KongTargetDataSource,
+		kongData.KongUpstreamDataSource,
 	}
 }
 

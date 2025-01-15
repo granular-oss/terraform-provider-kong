@@ -22,7 +22,7 @@ var (
 	_ resource.ResourceWithImportState = &kongConsumerResource{}
 )
 
-// NewkongConsumerResource is a helper function to simplify the provider implementation.
+// KongConsumerResource is a helper function to simplify the provider implementation.
 func KongConsumerResource() resource.Resource {
 	return &kongConsumerResource{}
 }

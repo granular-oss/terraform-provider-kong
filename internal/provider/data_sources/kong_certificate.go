@@ -16,7 +16,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &kongCertificateDataSource{}
 )
 
-func NewKongCertificateDataSource() datasource.DataSource {
+func KongCertificateDataSource() datasource.DataSource {
 	return &kongCertificateDataSource{}
 }
 

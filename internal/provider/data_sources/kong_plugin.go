@@ -12,25 +12,25 @@ import (
 )
 
 var (
-	_ datasource.DataSource              = &KongPluginDataSource{}
-	_ datasource.DataSourceWithConfigure = &KongPluginDataSource{}
+	_ datasource.DataSource              = &kongPluginDataSource{}
+	_ datasource.DataSourceWithConfigure = &kongPluginDataSource{}
 )
 
-func NewKongPluginDataSource() datasource.DataSource {
-	return &KongPluginDataSource{}
+func KongPluginDataSource() datasource.DataSource {
+	return &kongPluginDataSource{}
 }
 
-type KongPluginDataSource struct {
+type kongPluginDataSource struct {
 	client *kong.Client
 }
 
 // Metadata returns the data source type name.
-func (d *KongPluginDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *kongPluginDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_plugin"
 }
 
 // Configure adds the provider configured client to the data source.
-func (d *KongPluginDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *kongPluginDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	// Add a nil check when handling ProviderData because Terraform
 	// sets that data after it calls the ConfigureProvider RPC.
 	if req.ProviderData == nil {
@@ -51,7 +51,7 @@ func (d *KongPluginDataSource) Configure(_ context.Context, req datasource.Confi
 }
 
 // Schema defines the schema for the data source.
-func (d *KongPluginDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *kongPluginDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id":            schema.StringAttribute{Optional: true},
@@ -84,7 +84,7 @@ type pluginDataSourceModel struct {
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (d *KongPluginDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *kongPluginDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data pluginDataSourceModel
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

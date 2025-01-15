@@ -27,7 +27,6 @@ var (
 	_ resource.ResourceWithImportState = &kongRouteResource{}
 )
 
-// NewKongServiceResource is a helper function to simplify the provider implementation.
 func KongRouteResource() resource.Resource {
 	return &kongRouteResource{}
 }
@@ -198,9 +197,9 @@ func (r *kongRouteResource) Delete(ctx context.Context, req resource.DeleteReque
 }
 
 func (r *kongRouteResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	service, err := r.client.Routes.Get(ctx, kong.String(req.ID))
+	route, err := r.client.Routes.Get(ctx, kong.String(req.ID))
 	if err != nil {
 		resp.Diagnostics.AddError("Cannot find kong_route for the given name/id", err.Error())
 	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), service.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), route.ID)...)
 }

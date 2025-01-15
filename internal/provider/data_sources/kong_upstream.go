@@ -16,7 +16,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &kongUpstreamDataSource{}
 )
 
-func NewKongUpstreamDataSource() datasource.DataSource {
+func KongUpstreamDataSource() datasource.DataSource {
 	return &kongUpstreamDataSource{}
 }
 

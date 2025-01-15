@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	kongModels "github.com/granular-oss/terraform-provider-kong/internal/provider/models"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -23,7 +22,7 @@ var (
 	_ resource.ResourceWithImportState = &kongConsumerJwtResource{}
 )
 
-// NewkongConsumerJwtResource is a helper function to simplify the provider implementation.
+// KongConsumerJwtResource is a helper function to simplify the provider implementation.
 func KongConsumerJwtResource() resource.Resource {
 	return &kongConsumerJwtResource{}
 }
@@ -116,7 +115,7 @@ func (r *kongConsumerJwtResource) Create(ctx context.Context, req resource.Creat
 func (r *kongConsumerJwtResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state kongModels.KongConsumerJwtModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -165,7 +164,7 @@ func (r *kongConsumerJwtResource) Update(ctx context.Context, req resource.Updat
 func (r *kongConsumerJwtResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state kongModels.KongConsumerJwtModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -178,11 +177,11 @@ func (r *kongConsumerJwtResource) Delete(ctx context.Context, req resource.Delet
 }
 
 func (r *kongConsumerJwtResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	idParts := strings.Split(req.ID, ":")
+	idParts := kongModels.ParseCompositeId(req.ID)
 	auth, err := r.client.JWTAuths.Get(ctx, &idParts[0], &idParts[1])
 	if err != nil {
-		resp.Diagnostics.AddError("Cannot find kong_consumer_jwt for the given name/id:key/id", err.Error())
+		resp.Diagnostics.AddError("Cannot find kong_consumer_jwt for the given name/id|key/id", err.Error())
 	}
-	id := *auth.Consumer.ID + ":" + *auth.ID
+	id := kongModels.BuildCompositeId([]string{*auth.Consumer.ID, *auth.ID})
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }

@@ -16,7 +16,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &kongConsumerJwtDataSource{}
 )
 
-func NewKongConsumerJwtDataSource() datasource.DataSource {
+func KongConsumerJwtDataSource() datasource.DataSource {
 	return &kongConsumerJwtDataSource{}
 }
 
@@ -107,13 +107,13 @@ func (d *kongConsumerJwtDataSource) Read(ctx context.Context, req datasource.Rea
 
 	jwt, err := client.Get(ctx, consumerUsernameOrId, usernameOrId)
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to read kong_consumer_acl", err.Error())
+		resp.Diagnostics.AddError("Unable to read kong_consumer_jwt", err.Error())
 		return
 	}
 
 	result := kongModels.ConsumerJwtModelFromResponse(jwt)
 	diags2 := resp.State.Set(ctx, dataSourceModel{
-		ID:               result.ID,
+		ID:               result.KongId,
 		Key:              result.Key,
 		ConsumerID:       result.ConsumerID,
 		ConsumerUsername: data.ConsumerUsername,

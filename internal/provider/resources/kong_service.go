@@ -24,7 +24,7 @@ var (
 	_ resource.ResourceWithImportState = &kongServiceResource{}
 )
 
-// NewKongServiceResource is a helper function to simplify the provider implementation.
+// KongServiceResource is a helper function to simplify the provider implementation.
 func KongServiceResource() resource.Resource {
 	return &kongServiceResource{}
 }

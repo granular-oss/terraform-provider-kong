@@ -19,9 +19,8 @@ type KongConsumerJwtModel struct {
 }
 
 func ConsumerJwtModelFromResponse(jwt *kong.JWTAuth) KongConsumerJwtModel {
-	id := *jwt.Consumer.ID + ":" + *jwt.ID
 	return KongConsumerJwtModel{
-		ID:           types.StringValue(id),
+		ID:           types.StringValue(BuildCompositeId([]string{*jwt.Consumer.ID, *jwt.ID})),
 		KongId:       types.StringPointerValue(jwt.ID),
 		ConsumerID:   types.StringPointerValue(jwt.Consumer.ID),
 		Key:          types.StringPointerValue(jwt.Key),

@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	kongModels "github.com/granular-oss/terraform-provider-kong/internal/provider/models"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -23,7 +22,7 @@ var (
 	_ resource.ResourceWithImportState = &kongConsumerBasicAuthResource{}
 )
 
-// NewkongConsumerBasicAuthResource is a helper function to simplify the provider implementation.
+// KongConsumerBasicAuthResource is a helper function to simplify the provider implementation.
 func KongConsumerBasicAuthResource() resource.Resource {
 	return &kongConsumerBasicAuthResource{}
 }
@@ -45,7 +44,7 @@ func (r *kongConsumerBasicAuthResource) Schema(_ context.Context, _ resource.Sch
 			"id": schema.StringAttribute{Computed: true, Optional: false, Required: false, PlanModifiers: []planmodifier.String{
 				stringplanmodifier.UseStateForUnknown(),
 			}},
-			"kong_id": schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{
+			"kong_id": schema.StringAttribute{Computed: true, Optional: false, Required: false, PlanModifiers: []planmodifier.String{
 				stringplanmodifier.UseStateForUnknown(),
 			}},
 			"consumer_id": schema.StringAttribute{Required: true, PlanModifiers: []planmodifier.String{
@@ -90,7 +89,7 @@ func (r *kongConsumerBasicAuthResource) Create(ctx context.Context, req resource
 		return
 	}
 	reqBody := kongModels.RequestFromConsumerBasicAuthModel(ctx, &plan)
-	tflog.Debug(ctx, "Creating kong_consumer_acl", map[string]any{"body": reqBody, "model": plan})
+	tflog.Debug(ctx, "Creating kong_consumer_basic", map[string]any{"body": reqBody, "model": plan})
 
 	auth, err := client.Create(ctx, plan.ConsumerID.ValueStringPointer(), reqBody)
 	if err != nil {
@@ -110,7 +109,7 @@ func (r *kongConsumerBasicAuthResource) Create(ctx context.Context, req resource
 func (r *kongConsumerBasicAuthResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state kongModels.KongConsumerBasicAuthModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -161,7 +160,7 @@ func (r *kongConsumerBasicAuthResource) Update(ctx context.Context, req resource
 func (r *kongConsumerBasicAuthResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state kongModels.KongConsumerBasicAuthModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -174,11 +173,11 @@ func (r *kongConsumerBasicAuthResource) Delete(ctx context.Context, req resource
 }
 
 func (r *kongConsumerBasicAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	idParts := strings.Split(req.ID, ":")
+	idParts := kongModels.ParseCompositeId(req.ID)
 	auth, err := r.client.BasicAuths.Get(ctx, &idParts[0], &idParts[1])
 	if err != nil {
-		resp.Diagnostics.AddError("Cannot find kong_consumer_basic_auths for the given name/id:username/id", err.Error())
+		resp.Diagnostics.AddError("Cannot find kong_consumer_basic_auths for the given name/id|username/id", err.Error())
 	}
-	id := *auth.Consumer.ID + ":" + *auth.ID
+	id := kongModels.BuildCompositeId([]string{*auth.Consumer.ID, *auth.ID})
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }

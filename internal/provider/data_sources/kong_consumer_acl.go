@@ -16,7 +16,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &kongConsumerAclDataSource{}
 )
 
-func NewKongConsumerAclDataSource() datasource.DataSource {
+func KongConsumerAclDataSource() datasource.DataSource {
 	return &kongConsumerAclDataSource{}
 }
 

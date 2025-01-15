@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	kongModels "github.com/granular-oss/terraform-provider-kong/internal/provider/models"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -24,7 +23,7 @@ var (
 	_ resource.ResourceWithImportState = &kongConsumerOauth2Resource{}
 )
 
-// NewkongConsumerOauth2Resource is a helper function to simplify the provider implementation.
+// KongConsumerOauth2Resource is a helper function to simplify the provider implementation.
 func KongConsumerOauth2Resource() resource.Resource {
 	return &kongConsumerOauth2Resource{}
 }
@@ -116,7 +115,7 @@ func (r *kongConsumerOauth2Resource) Create(ctx context.Context, req resource.Cr
 func (r *kongConsumerOauth2Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state kongModels.KongConsumerOauth2Model
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -171,7 +170,7 @@ func (r *kongConsumerOauth2Resource) Update(ctx context.Context, req resource.Up
 func (r *kongConsumerOauth2Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state kongModels.KongConsumerOauth2Model
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), ":")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -184,11 +183,11 @@ func (r *kongConsumerOauth2Resource) Delete(ctx context.Context, req resource.De
 }
 
 func (r *kongConsumerOauth2Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	idParts := strings.Split(req.ID, ":")
+	idParts := kongModels.ParseCompositeId(req.ID)
 	key, err := r.client.Oauth2Credentials.Get(ctx, &idParts[0], &idParts[1])
 	if err != nil {
-		resp.Diagnostics.AddError("Cannot find kong_consumer_oauth2 for the given name/id:group", err.Error())
+		resp.Diagnostics.AddError("Cannot find kong_consumer_oauth2 for the given name/id|group", err.Error())
 	}
-	id := *key.Consumer.ID + ":" + *key.ID
+	id := kongModels.BuildCompositeId([]string{*key.Consumer.ID, *key.ID})
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }

@@ -20,9 +20,8 @@ type KongConsumerOauth2Model struct {
 }
 
 func ConsumerOauth2ModelFromResponse(oauth *kong.Oauth2Credential) KongConsumerOauth2Model {
-	id := *oauth.Consumer.ID + ":" + *oauth.ID
 	return KongConsumerOauth2Model{
-		ID:           types.StringValue(id),
+		ID:           types.StringValue(BuildCompositeId([]string{*oauth.Consumer.ID, *oauth.ID})),
 		Name:         types.StringValue(*oauth.Name),
 		KongId:       types.StringPointerValue(oauth.ID),
 		ConsumerID:   types.StringPointerValue(oauth.Consumer.ID),
