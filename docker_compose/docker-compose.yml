@@ -1,0 +1,69 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+services:
+  kongdatabase:
+    image: postgres:12
+    container_name: test_kong_database
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: pgpass123 #gitleaks:allow
+      POSTGRES_USER: kong
+    healthcheck:
+      test: ["CMD","pg_isready", "-U", "kong"]
+      interval: 30s
+      timeout: 30s
+      start_period: 60s
+      retries: 30
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    networks:
+      - kong-provider
+
+  kong:
+    image: kong:3.7-ubuntu
+    command: >
+      /bin/sh -c "sleep 15 && kong migrations bootstrap && kong start"
+    depends_on:
+      - kongdatabase
+    container_name: test_kong
+    ports:
+      - 8001:8001
+    healthcheck:
+      test: ["CMD","curl","-s","http://localhost:8001/status"]
+      interval: 3s
+      timeout: 30s
+      retries: 100
+      start_period: 60s
+    environment:
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: '0.0.0.0:8001'
+      KONG_DATABASE: postgres
+      KONG_PLUGINS: bundled
+      KONG_PG_DATABASE: kong
+      KONG_PG_HOST: test_kong_database
+      KONG_PG_PASSWORD: pgpass123
+      KONG_PG_USER: kong
+      KONG_NGINX_WORKER_PROCESSES: 1 # DO NOT REMOVE or ci/cd will randomly fail as kong will get CPU hungry
+    networks:
+      - kong-provider
+
+  # tf-host:
+  #   image: debian:bookworm-slim
+  #   build:
+  #     context: .
+  #     dockerfile: integration_test/Dockerfile
+  #     args:
+  #       - GITLAB_TOKEN
+  #   depends_on:
+  #     kong:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./:/app:delegated
+  #   networks:
+  #     - kong-provider
+
+networks:
+  kong-provider:

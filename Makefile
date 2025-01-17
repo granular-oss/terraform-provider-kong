@@ -1,20 +1,30 @@
-GOFMT_FILES?=$$(find ./ -name '*.go' | grep -v vendor)
-
-default: build test testacc
-
-travisbuild: deps default
-
-test:
-	TF_ACC=1 go test -v ./kong -run="TestAcc"
+default: fmt lint install generate
 
 build:
-	@go build ./kong
+	go build -v ./...
 
-clean:
-	rm -rf pkg/
+install: build
+	go install -v ./...
+
+lint:
+	golangci-lint run
+
+generate:
+	cd tools; go generate ./...
 
 fmt:
-	go fmt ./...
+	gofmt -s -w -e .
 
+test:
+	go test -v -cover -timeout=120s -parallel=10 ./...
 
-.PHONY: build test testacc vet goimports goimportscheck errcheck vendor-status test-compile
+testacc: start
+	TF_ACC=1 go test -v -cover -timeout 120m ./...
+
+.PHONY: fmt lint test testacc build install generate
+
+start:
+	cd docker_compose; docker compose up -d && bash create_test_data
+
+stop:
+	cd docker_compose; docker compose down
