@@ -41,11 +41,10 @@ resource "kong_route" "complete" {
   https_redirect_status_code = 301
   request_buffering          = false
   response_buffering         = false
-  header = [{
+  header {
     name  = "header-test"
     value = ["1", "2"]
-  }]
-
+  }
 }
 ```
 
@@ -60,7 +59,7 @@ resource "kong_route" "complete" {
 ### Optional
 
 - `destination` (Attributes List) (see [below for nested schema](#nestedatt--destination))
-- `header` (Attributes List) (see [below for nested schema](#nestedatt--header))
+- `header` (Block Set) (see [below for nested schema](#nestedblock--header))
 - `hosts` (List of String)
 - `https_redirect_status_code` (Number)
 - `methods` (List of String)
@@ -89,7 +88,7 @@ Required:
 - `port` (Number)
 
 
-<a id="nestedatt--header"></a>
+<a id="nestedblock--header"></a>
 ### Nested Schema for `header`
 
 Required:
