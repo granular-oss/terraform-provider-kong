@@ -15,8 +15,11 @@ import (
 )
 
 const (
-	providerConfig = `provider "kong" {}
-	`
+	providerConfig = `
+provider "kong" {
+	kong_admin_uri = "http://localhost:8003"
+}
+`
 )
 
 func buildJsonPath(path string) tfjsonpath.Path {

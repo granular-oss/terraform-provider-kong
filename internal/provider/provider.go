@@ -88,10 +88,9 @@ func (p *kongProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 
 func configWithEnvFallback(configValue types.String, envKey string, fallback string) string {
 	value, exists := os.LookupEnv(envKey)
-	if !configValue.IsNull() {
+	if !configValue.IsUnknown() {
 		value = configValue.ValueString()
-	}
-	if !exists {
+	} else if !exists {
 		value = fallback
 	}
 	return value
@@ -99,8 +98,8 @@ func configWithEnvFallback(configValue types.String, envKey string, fallback str
 
 func (p *kongProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var config kongProviderModel
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	diags := req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
 		return
