@@ -26,9 +26,8 @@ resource "kong_route" "complete" {
   https_redirect_status_code = 301
   request_buffering          = false
   response_buffering         = false
-  header = [{
+  header {
     name  = "header-test"
     value = ["1", "2"]
-  }]
-
+  }
 }

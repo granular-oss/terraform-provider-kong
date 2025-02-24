@@ -78,12 +78,17 @@ func (r *kongRouteResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 			"https_redirect_status_code": schema.Int32Attribute{Optional: true, Computed: true},
 			"request_buffering":          schema.BoolAttribute{Optional: true, Computed: true, Default: booldefault.StaticBool(true)},
 			"response_buffering":         schema.BoolAttribute{Optional: true, Computed: true, Default: booldefault.StaticBool(true)},
-			"header": schema.ListNestedAttribute{Optional: true, NestedObject: schema.NestedAttributeObject{
-				Attributes: map[string]schema.Attribute{
-					"name":   schema.StringAttribute{Required: true},
-					"values": schema.ListAttribute{Required: true, ElementType: types.StringType},
+			// "header": schema.ListNestedAttribute{Optional: true, NestedObject: },
+		},
+		Blocks: map[string]schema.Block{
+			"header": schema.SetNestedBlock{
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"name":   schema.StringAttribute{Required: true},
+						"values": schema.ListAttribute{Required: true, ElementType: types.StringType},
+					},
 				},
-			}},
+			},
 		},
 	}
 }

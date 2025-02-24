@@ -88,7 +88,7 @@ resource "kong_route" "test" {
 					assertBoolValue("kong_route.test", "request_buffering", true),
 					assertBoolValue("kong_route.test", "response_buffering", true),
 					assertNullValue("kong_route.test", "tags"),
-					assertNullValue("kong_route.test", "header"),
+					statecheck.ExpectKnownValue("kong_route.test", buildJsonPath("header"), knownvalue.ListExact([]knownvalue.Check{})),
 				},
 			},
 			{
@@ -118,11 +118,16 @@ resource "kong_route" "test" {
   https_redirect_status_code = 301
   request_buffering          = false
   response_buffering         = false
-  header = [{
+
+  header {
     name  = "header-test"
     values = ["1", "2"]
-  }]
+  }
 
+  header {
+    name  = "header-test2"
+    values = ["1", "2"]
+  }
 }
 `,
 				ConfigStateChecks: []statecheck.StateCheck{
@@ -147,6 +152,13 @@ resource "kong_route" "test" {
 					statecheck.ExpectKnownValue("kong_route.test", tfjsonpath.New("header"), knownvalue.ListExact([]knownvalue.Check{
 						knownvalue.ObjectExact(map[string]knownvalue.Check{
 							"name": knownvalue.StringExact("header-test"),
+							"values": knownvalue.ListExact([]knownvalue.Check{
+								knownvalue.StringExact("1"),
+								knownvalue.StringExact("2"),
+							}),
+						}),
+						knownvalue.ObjectExact(map[string]knownvalue.Check{
+							"name": knownvalue.StringExact("header-test2"),
 							"values": knownvalue.ListExact([]knownvalue.Check{
 								knownvalue.StringExact("1"),
 								knownvalue.StringExact("2"),
@@ -187,7 +199,7 @@ resource "kong_route" "test" {
 					assertBoolValue("kong_route.test", "request_buffering", true),
 					assertBoolValue("kong_route.test", "response_buffering", true),
 					assertNullValue("kong_route.test", "tags"),
-					assertNullValue("kong_route.test", "header"),
+					statecheck.ExpectKnownValue("kong_route.test", buildJsonPath("header"), knownvalue.ListExact([]knownvalue.Check{})),
 				},
 			},
 		},
