@@ -53,6 +53,27 @@ data "kong_route" "test" {
 }
 
 func TestAccKongRouteResource(t *testing.T) {
+	expectedState := []statecheck.StateCheck{
+		assertNotNull("kong_route.test", "id"),
+		assertStringValue("kong_route.test", "name", "test2"),
+		assertStringArrayValue("kong_route.test", "protocols", []string{"http", "https"}),
+		assertNullValue("kong_route.test", "methods"),
+		assertNullValue("kong_route.test", "hosts"),
+		assertStringArrayValue("kong_route.test", "paths", []string{"/foobar"}),
+		assertBoolValue("kong_route.test", "strip_path", true),
+		assertNullValue("kong_route.test", "source"),
+		assertNullValue("kong_route.test", "destination"),
+		assertNullValue("kong_route.test", "snis"),
+		assertBoolValue("kong_route.test", "preserve_host", false),
+		assertInt32Value("kong_route.test", "regex_priority", 0),
+		assertStateMatch("kong_route.test", "service_id", "kong_service.test", "id"),
+		assertStringValue("kong_route.test", "path_handling", "v0"),
+		assertInt32Value("kong_route.test", "https_redirect_status_code", 426),
+		assertBoolValue("kong_route.test", "request_buffering", true),
+		assertBoolValue("kong_route.test", "response_buffering", true),
+		assertNullValue("kong_route.test", "tags"),
+		statecheck.ExpectKnownValue("kong_route.test", buildJsonPath("header"), knownvalue.ListExact([]knownvalue.Check{})),
+	}
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
@@ -69,27 +90,7 @@ resource "kong_route" "test" {
   service_id = kong_service.test.id
 }
 `,
-				ConfigStateChecks: []statecheck.StateCheck{
-					assertNotNull("kong_route.test", "id"),
-					assertStringValue("kong_route.test", "name", "test2"),
-					assertStringArrayValue("kong_route.test", "protocols", []string{"http", "https"}),
-					assertNullValue("kong_route.test", "methods"),
-					assertNullValue("kong_route.test", "hosts"),
-					assertStringArrayValue("kong_route.test", "paths", []string{"/foobar"}),
-					assertBoolValue("kong_route.test", "strip_path", true),
-					assertNullValue("kong_route.test", "source"),
-					assertNullValue("kong_route.test", "destination"),
-					assertNullValue("kong_route.test", "snis"),
-					assertBoolValue("kong_route.test", "preserve_host", false),
-					assertInt32Value("kong_route.test", "regex_priority", 0),
-					assertStateMatch("kong_route.test", "service_id", "kong_service.test", "id"),
-					assertStringValue("kong_route.test", "path_handling", "v0"),
-					assertInt32Value("kong_route.test", "https_redirect_status_code", 426),
-					assertBoolValue("kong_route.test", "request_buffering", true),
-					assertBoolValue("kong_route.test", "response_buffering", true),
-					assertNullValue("kong_route.test", "tags"),
-					statecheck.ExpectKnownValue("kong_route.test", buildJsonPath("header"), knownvalue.ListExact([]knownvalue.Check{})),
-				},
+				ConfigStateChecks: expectedState,
 			},
 			{
 				ResourceName:      "kong_route.test",
@@ -180,26 +181,24 @@ resource "kong_route" "test" {
   service_id = kong_service.test.id
 }
 `,
+				ConfigStateChecks: expectedState,
+			},
+			{
+				Config: providerConfig + `
+resource "kong_service" "test" {
+  name = "test2"
+  host = "example.com"
+}
+
+resource "kong_route" "test" {
+  name  = "test2"
+  paths = ["/foobar"]
+  service_id = kong_service.test.id
+  hosts      = []
+}
+`,
 				ConfigStateChecks: []statecheck.StateCheck{
-					assertNotNull("kong_route.test", "id"),
-					assertStringValue("kong_route.test", "name", "test2"),
-					assertStringArrayValue("kong_route.test", "protocols", []string{"http", "https"}),
-					assertNullValue("kong_route.test", "methods"),
-					assertNullValue("kong_route.test", "hosts"),
-					assertStringArrayValue("kong_route.test", "paths", []string{"/foobar"}),
-					assertBoolValue("kong_route.test", "strip_path", true),
-					assertNullValue("kong_route.test", "source"),
-					assertNullValue("kong_route.test", "destination"),
-					assertNullValue("kong_route.test", "snis"),
-					assertBoolValue("kong_route.test", "preserve_host", false),
-					assertInt32Value("kong_route.test", "regex_priority", 0),
-					assertStateMatch("kong_route.test", "service_id", "kong_service.test", "id"),
-					assertStringValue("kong_route.test", "path_handling", "v0"),
-					assertInt32Value("kong_route.test", "https_redirect_status_code", 426),
-					assertBoolValue("kong_route.test", "request_buffering", true),
-					assertBoolValue("kong_route.test", "response_buffering", true),
-					assertNullValue("kong_route.test", "tags"),
-					statecheck.ExpectKnownValue("kong_route.test", buildJsonPath("header"), knownvalue.ListExact([]knownvalue.Check{})),
+					assertStringArrayValue("kong_route.test", "hosts", []string{}),
 				},
 			},
 		},
