@@ -132,6 +132,9 @@ func (r *kongRouteResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 	result := kongModels.RouteModelFromResponse(route)
+	if result.Hosts.IsNull() {
+		result.Hosts = plan.Hosts
+	}
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -153,7 +156,11 @@ func (r *kongRouteResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 	tflog.Debug(ctx, "Reading kong_route state", map[string]any{"state_file": state, "upstream": route})
-	diags = resp.State.Set(ctx, kongModels.RouteModelFromResponse(route))
+	model := kongModels.RouteModelFromResponse(route)
+	if model.Hosts.IsNull() {
+		model.Hosts = state.Hosts
+	}
+	diags = resp.State.Set(ctx, model)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -179,6 +186,9 @@ func (r *kongRouteResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 	result := kongModels.RouteModelFromResponse(route)
+	if result.Hosts.IsNull() {
+		result.Hosts = plan.Hosts
+	}
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
