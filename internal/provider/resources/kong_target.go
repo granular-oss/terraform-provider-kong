@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	kongModels "github.com/granular-oss/terraform-provider-kong/internal/provider/models"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -117,7 +116,7 @@ func (r *kongTargetResource) Create(ctx context.Context, req resource.CreateRequ
 func (r *kongTargetResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state kongModels.KongTargetModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), "|")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -146,7 +145,7 @@ func (r *kongTargetResource) Read(ctx context.Context, req resource.ReadRequest,
 func (r *kongTargetResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan kongModels.KongTargetModel
 	diags := req.Plan.Get(ctx, &plan)
-	idParts := strings.Split(plan.ID.ValueString(), "|")
+	idParts := kongModels.ParseCompositeId(plan.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -173,7 +172,7 @@ func (r *kongTargetResource) Update(ctx context.Context, req resource.UpdateRequ
 func (r *kongTargetResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state kongModels.KongTargetModel
 	diags := req.State.Get(ctx, &state)
-	idParts := strings.Split(state.ID.ValueString(), "|")
+	idParts := kongModels.ParseCompositeId(state.ID.ValueString())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -186,7 +185,7 @@ func (r *kongTargetResource) Delete(ctx context.Context, req resource.DeleteRequ
 }
 
 func (r *kongTargetResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	idParts := strings.Split(req.ID, "|")
+	idParts := kongModels.ParseCompositeId(req.ID)
 	targets, err := r.client.Targets.ListAll(ctx, &idParts[0])
 	if err != nil {
 		resp.Diagnostics.AddError("Error Reading kong_target", "Could not read kong_target with ID "+idParts[0]+": "+err.Error())
