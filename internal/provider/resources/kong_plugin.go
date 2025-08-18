@@ -176,24 +176,24 @@ func (r *kongPluginResource) Delete(ctx context.Context, req resource.DeleteRequ
 }
 
 func (r *kongPluginResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	if !strings.Contains(req.ID, ":") {
+	if !strings.Contains(req.ID, "|") {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
 		return
 	}
-	idPairs := strings.Split(req.ID, ":")
-	if len(idPairs) != 3 {
-		resp.Diagnostics.AddError("Invalid import ID", "You must import by plugin ID or `type:parent_id:plugin_name` where type in [`service`,`route`,`consumer`]")
+	idParts := kongModels.ParseCompositeId(req.ID)
+	if len(idParts) != 3 {
+		resp.Diagnostics.AddError("Invalid import ID", "You must import by plugin ID or `type|parent_id|plugin_name` where type in [`service`,`route`,`consumer`]")
 		return
 	}
 	var plugin *kong.Plugin
-	if idPairs[0] == "service" {
-		plugin = kongModels.GetPluginByService(ctx, resp.Diagnostics, r.client, &idPairs[1], idPairs[2])
+	if idParts[0] == "service" {
+		plugin = kongModels.GetPluginByService(ctx, resp.Diagnostics, r.client, &idParts[1], idParts[2])
 		tflog.Debug(ctx, "Found plugin for service", map[string]any{"plugin": plugin})
-	} else if idPairs[0] == "route" {
-		plugin = kongModels.GetPluginByRoute(ctx, resp.Diagnostics, r.client, &idPairs[1], idPairs[2])
+	} else if idParts[0] == "route" {
+		plugin = kongModels.GetPluginByRoute(ctx, resp.Diagnostics, r.client, &idParts[1], idParts[2])
 		tflog.Debug(ctx, "Found plugin for route", map[string]any{"plugin": plugin})
-	} else if idPairs[0] == "consumer" {
-		plugin = kongModels.GetPluginByConsumer(ctx, resp.Diagnostics, r.client, &idPairs[1], idPairs[2])
+	} else if idParts[0] == "consumer" {
+		plugin = kongModels.GetPluginByConsumer(ctx, resp.Diagnostics, r.client, &idParts[1], idParts[2])
 		tflog.Debug(ctx, "Found plugin for consumer", map[string]any{"plugin": plugin})
 	}
 	if plugin == nil {
