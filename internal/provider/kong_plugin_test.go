@@ -180,7 +180,7 @@ resource "kong_plugin" "test" {
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"config_json", "strict_match"},
-				ImportStateId:           "service:service_plugin:cors",
+				ImportStateId:           "service|service_plugin|cors",
 			},
 			{
 				Config: providerConfig + `
@@ -325,7 +325,7 @@ resource "kong_plugin" "test" {
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"config_json", "strict_match"},
-				ImportStateId:           "route:route_plugin:cors",
+				ImportStateId:           "route|route_plugin|cors",
 			},
 			{
 				Config: providerConfig + `
@@ -483,7 +483,7 @@ resource "kong_plugin" "test" {
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"config_json", "strict_match"},
-				ImportStateId:           "consumer:consumer_plugin:aws-lambda",
+				ImportStateId:           "consumer|consumer_plugin|aws-lambda",
 			},
 			{
 				Config: providerConfig + `
